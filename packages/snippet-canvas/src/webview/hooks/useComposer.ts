@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useVSCode } from "../context/vscode/VSCodeContext";
 import type {
-  ComposerSettings,
   ComposerSettingsPatch,
   ColumnSettings,
   SnippetCanvasDocument,
