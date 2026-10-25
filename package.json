@@ -1,50 +1,696 @@
 {
-  "name": "monorepo-template",
+  "name": "snippetcanvas",
+  "displayName": "SnippetCanvas",
+  "description": "Compose code selections into polished multi-column images.",
   "version": "0.1.0",
-  "private": true,
-  "type": "module",
+  "publisher": "moyarich",
+  "author": "Moya Richards",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Snippets",
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "moyarich",
+    "snippets",
+    "code snippets"
+  ],
+  "activationEvents": [
+    "onCommand:snippetCanvas.addSelection",
+    "onCommand:snippetCanvas.addFile",
+    "onCommand:snippetCanvas.open",
+    "onCommand:snippetCanvas.clear"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "SnippetCanvas",
+      "properties": {
+        "snippetCanvas.defaultColors": {
+          "type": "array",
+          "scope": "window",
+          "description": "Colors and CSS gradients offered by SnippetCanvas color pickers.",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "#0b1020",
+            "#111827",
+            "#f8fafc",
+            "#e5e7eb",
+            "#8b5cf6",
+            "#268bd2",
+            "#22c55e",
+            "#f59e0b",
+            "#ef4444",
+            "#000000",
+            "linear-gradient(135deg, #312e81 0%, #020617 100%)",
+            "linear-gradient(145deg, #ff79c6 0%, #44475a 100%)"
+          ]
+        },
+        "snippetCanvas.themes": {
+          "type": "array",
+          "scope": "window",
+          "description": "Theme names and palettes available in the composer.",
+          "items": {
+            "type": "object",
+            "required": [
+              "value",
+              "label",
+              "palette"
+            ],
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "midnight",
+                  "github-dark",
+                  "dracula",
+                  "nord",
+                  "one-dark",
+                  "solarized-light"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "palette": {
+                "type": "object",
+                "required": [
+                  "columnBackground",
+                  "foreground",
+                  "accent"
+                ],
+                "properties": {
+                  "columnBackground": {
+                    "type": "string",
+                    "format": "color-hex"
+                  },
+                  "foreground": {
+                    "type": "string",
+                    "format": "color-hex"
+                  },
+                  "accent": {
+                    "type": "string",
+                    "format": "color-hex"
+                  }
+                }
+              }
+            }
+          },
+          "default": [
+            {
+              "value": "midnight",
+              "label": "Midnight",
+              "palette": {
+                "columnBackground": "#0b1020",
+                "foreground": "#e5e7eb",
+                "accent": "#8b5cf6"
+              }
+            },
+            {
+              "value": "github-dark",
+              "label": "GitHub Dark",
+              "palette": {
+                "columnBackground": "#0d1117",
+                "foreground": "#c9d1d9",
+                "accent": "#58a6ff"
+              }
+            },
+            {
+              "value": "dracula",
+              "label": "Dracula",
+              "palette": {
+                "columnBackground": "#282a36",
+                "foreground": "#f8f8f2",
+                "accent": "#bd93f9"
+              }
+            },
+            {
+              "value": "nord",
+              "label": "Nord",
+              "palette": {
+                "columnBackground": "#2e3440",
+                "foreground": "#eceff4",
+                "accent": "#88c0d0"
+              }
+            },
+            {
+              "value": "one-dark",
+              "label": "One Dark",
+              "palette": {
+                "columnBackground": "#282c34",
+                "foreground": "#abb2bf",
+                "accent": "#61afef"
+              }
+            },
+            {
+              "value": "solarized-light",
+              "label": "Solarized Light",
+              "palette": {
+                "columnBackground": "#fdf6e3",
+                "foreground": "#586e75",
+                "accent": "#268bd2"
+              }
+            }
+          ]
+        },
+        "snippetCanvas.mode": {
+          "type": "string",
+          "enum": [
+            "fit",
+            "grid",
+            "flow"
+          ],
+          "default": "fit",
+          "scope": "window",
+          "description": "Default composer mode for new documents: Fit expands exported pages to complete code, Grid uses a maximum column count, and Flow packs columns by width."
+        },
+        "snippetCanvas.columnsPerRow": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 4,
+          "scope": "window",
+          "description": "Default maximum number of columns per row in Grid mode."
+        },
+        "snippetCanvas.columnGap": {
+          "type": "number",
+          "default": 20,
+          "minimum": 0,
+          "maximum": 120,
+          "scope": "window",
+          "description": "Default gap between columns in pixels."
+        },
+        "snippetCanvas.page.width": {
+          "type": "number",
+          "default": 1400,
+          "minimum": 500,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "Page width in pixels in Grid and Flow modes; minimum automatic width in Fit mode."
+        },
+        "snippetCanvas.page.height": {
+          "type": "number",
+          "default": 900,
+          "minimum": 500,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "Page height in pixels in Grid and Flow modes; minimum automatic height in Fit mode."
+        },
+        "snippetCanvas.page.padding": {
+          "type": "number",
+          "default": 40,
+          "minimum": 0,
+          "maximum": 240,
+          "scope": "window",
+          "description": "Default page padding in pixels."
+        },
+        "snippetCanvas.page.backgroundType": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "gradient",
+            "image"
+          ],
+          "enumDescriptions": [
+            "Paint using the configured solid color, including alpha transparency.",
+            "Paint using the configured CSS gradient.",
+            "Use the configured remote image URL."
+          ],
+          "default": "solid",
+          "scope": "window",
+          "description": "Default page background source. In the composer, Paint switches between solid and gradient automatically and supports transparency through alpha."
+        },
+        "snippetCanvas.page.background": {
+          "type": "string",
+          "default": "#111827",
+          "scope": "window",
+          "description": "Default CSS color used by the page Paint picker. Supports hex, rgb(), rgba(), and transparent values."
+        },
+        "snippetCanvas.page.gradient": {
+          "type": "string",
+          "default": "linear-gradient(135deg, #7c3aed 0%, #0f172a 100%)",
+          "scope": "window",
+          "description": "Default CSS gradient used by the page Paint picker, including type, stops, positions, and angle."
+        },
+        "snippetCanvas.page.backgroundImage": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Default remote image URL when the page background type is Image."
+        },
+        "snippetCanvas.column.width": {
+          "type": "number",
+          "default": 650,
+          "minimum": 200,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "Default column width in pixels."
+        },
+        "snippetCanvas.column.height": {
+          "type": "number",
+          "default": 400,
+          "minimum": 200,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "Default column height in pixels."
+        },
+        "snippetCanvas.column.fontSize": {
+          "type": "number",
+          "default": 15,
+          "minimum": 1,
+          "maximum": 200,
+          "scope": "window",
+          "description": "Default code font size in pixels."
+        },
+        "snippetCanvas.column.scaleFontOnResize": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Shrink or grow a column's code font proportionally when the column is resized with its handles."
+        },
+        "snippetCanvas.column.lineHeight": {
+          "type": "number",
+          "default": 1.55,
+          "minimum": 1.1,
+          "maximum": 2,
+          "scope": "window",
+          "description": "Default code line-height multiplier."
+        },
+        "snippetCanvas.column.padding": {
+          "type": "number",
+          "default": 18,
+          "minimum": 0,
+          "maximum": 80,
+          "scope": "window",
+          "description": "Default internal column padding in pixels."
+        },
+        "snippetCanvas.column.syntaxTheme": {
+          "type": "string",
+          "enum": [
+            "midnight",
+            "github-dark",
+            "dracula",
+            "nord",
+            "one-dark",
+            "solarized-light"
+          ],
+          "default": "midnight",
+          "scope": "window",
+          "description": "Default syntax-highlighting theme and its column, text, and accent palette."
+        },
+        "snippetCanvas.column.fontFamily": {
+          "type": "string",
+          "enum": [
+            "JetBrains Mono",
+            "Fira Code",
+            "Source Code Pro",
+            "IBM Plex Mono",
+            "Roboto Mono",
+            "Space Mono",
+            "ui-monospace"
+          ],
+          "default": "JetBrains Mono",
+          "scope": "window",
+          "description": "Default bundled coding font."
+        },
+        "snippetCanvas.column.googleFontFamily": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Optional Google Fonts family name. When set, it takes precedence over the bundled coding font."
+        },
+        "snippetCanvas.column.indentSize": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 8,
+          "scope": "window",
+          "description": "Default visual tab width."
+        },
+        "snippetCanvas.column.codeAlignment": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left",
+          "scope": "window",
+          "description": "Default code alignment."
+        },
+        "snippetCanvas.column.borderRadius": {
+          "type": "number",
+          "default": 14,
+          "minimum": 0,
+          "maximum": 32,
+          "scope": "window",
+          "description": "Default column corner radius in pixels."
+        },
+        "snippetCanvas.column.frameStyle": {
+          "type": "string",
+          "enum": [
+            "macos",
+            "minimal",
+            "terminal",
+            "none"
+          ],
+          "default": "macos",
+          "scope": "window",
+          "description": "Default code-window frame style."
+        },
+        "snippetCanvas.column.showChrome": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show column window chrome by default."
+        },
+        "snippetCanvas.column.showFileName": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show filenames in column headers by default."
+        },
+        "snippetCanvas.column.showLineNumbers": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show code line numbers by default."
+        },
+        "snippetCanvas.column.shadow.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Enable column shadows by default."
+        },
+        "snippetCanvas.column.shadow.x": {
+          "type": "number",
+          "default": 0,
+          "minimum": -50,
+          "maximum": 50,
+          "scope": "window",
+          "description": "Default horizontal shadow offset."
+        },
+        "snippetCanvas.column.shadow.y": {
+          "type": "number",
+          "default": 20,
+          "minimum": -50,
+          "maximum": 80,
+          "scope": "window",
+          "description": "Default vertical shadow offset."
+        },
+        "snippetCanvas.column.shadow.blur": {
+          "type": "number",
+          "default": 48,
+          "minimum": 0,
+          "maximum": 100,
+          "scope": "window",
+          "description": "Default shadow blur radius."
+        },
+        "snippetCanvas.column.shadow.spread": {
+          "type": "number",
+          "default": 0,
+          "minimum": -30,
+          "maximum": 50,
+          "scope": "window",
+          "description": "Default shadow spread radius."
+        },
+        "snippetCanvas.column.shadow.opacity": {
+          "type": "number",
+          "default": 0.4,
+          "minimum": 0,
+          "maximum": 1,
+          "scope": "window",
+          "description": "Default shadow opacity."
+        },
+        "snippetCanvas.column.shadow.color": {
+          "type": "string",
+          "default": "#000000",
+          "format": "color-hex",
+          "scope": "window",
+          "description": "Default shadow color."
+        },
+        "snippetCanvas.column.title.fontSize": {
+          "type": "number",
+          "default": 12,
+          "minimum": 8,
+          "maximum": 40,
+          "scope": "window",
+          "description": "Default column-title font size."
+        },
+        "snippetCanvas.column.title.fontFamily": {
+          "type": "string",
+          "default": "Inter",
+          "scope": "window",
+          "description": "Default column-title font family."
+        },
+        "snippetCanvas.column.title.fontWeight": {
+          "type": "number",
+          "enum": [
+            400,
+            500,
+            600,
+            700,
+            800
+          ],
+          "default": 600,
+          "scope": "window",
+          "description": "Default column-title font weight."
+        },
+        "snippetCanvas.column.title.alignment": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left",
+          "scope": "window",
+          "description": "Default column-title alignment."
+        },
+        "snippetCanvas.column.decorations.caption": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Default caption displayed in every column."
+        },
+        "snippetCanvas.column.decorations.watermark": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Default watermark displayed in every column."
+        },
+        "snippetCanvas.column.decorations.icon": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Default icon or emoji displayed in every column."
+        },
+        "snippetCanvas.column.decorations.tilt": {
+          "type": "number",
+          "default": 0,
+          "minimum": -8,
+          "maximum": 8,
+          "scope": "window",
+          "description": "Default column tilt in degrees."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "snippetCanvas.addSelection",
+        "title": "SnippetCanvas: Add Selection",
+        "shortTitle": "Add Selection"
+      },
+      {
+        "command": "snippetCanvas.addFile",
+        "title": "SnippetCanvas: Add Entire File",
+        "shortTitle": "Add Entire File",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "snippetCanvas.open",
+        "title": "SnippetCanvas: Open Composer",
+        "shortTitle": "Open Composer"
+      },
+      {
+        "command": "snippetCanvas.clear",
+        "title": "SnippetCanvas: Clear Snippets",
+        "shortTitle": "Clear Snippets"
+      },
+      {
+        "command": "snippetCanvas.renameSnippet",
+        "title": "Rename Snippet",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "snippetCanvas.deleteSnippet",
+        "title": "Delete Snippet",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "snippetCanvas.moveSnippetUp",
+        "title": "Move Snippet Up",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "snippetCanvas.moveSnippetDown",
+        "title": "Move Snippet Down",
+        "icon": "$(arrow-down)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "snippetCanvas",
+          "title": "SnippetCanvas",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "snippetCanvas": [
+        {
+          "id": "snippetCanvas.snippets",
+          "name": "Snippets"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "snippetCanvas.snippets",
+        "contents": "Add selected code or the complete active file.\n[Add Selection](command:snippetCanvas.addSelection)\n[Add Entire File](command:snippetCanvas.addFile)\n[Open Composer](command:snippetCanvas.open)",
+        "when": ""
+      }
+    ],
+    "submenus": [
+      {
+        "id": "snippetCanvas.editorMenu",
+        "label": "SnippetCanvas"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "snippetCanvas.editorMenu",
+          "when": "editorTextFocus",
+          "group": "navigation@100"
+        }
+      ],
+      "snippetCanvas.editorMenu": [
+        {
+          "command": "snippetCanvas.addSelection",
+          "when": "editorHasSelection",
+          "group": "1_capture@1"
+        },
+        {
+          "command": "snippetCanvas.addFile",
+          "group": "1_capture@2"
+        },
+        {
+          "command": "snippetCanvas.open",
+          "group": "2_composer@1"
+        },
+        {
+          "command": "snippetCanvas.clear",
+          "group": "3_manage@1"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "snippetCanvas.addSelection",
+          "when": "view == snippetCanvas.snippets && editorHasSelection",
+          "group": "navigation@1"
+        },
+        {
+          "command": "snippetCanvas.addFile",
+          "when": "view == snippetCanvas.snippets",
+          "group": "navigation@2"
+        },
+        {
+          "command": "snippetCanvas.open",
+          "when": "view == snippetCanvas.snippets",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "snippetCanvas.renameSnippet",
+          "when": "view == snippetCanvas.snippets && viewItem == snippetCanvas.snippet",
+          "group": "inline@1"
+        },
+        {
+          "command": "snippetCanvas.deleteSnippet",
+          "when": "view == snippetCanvas.snippets && viewItem == snippetCanvas.snippet",
+          "group": "inline@2"
+        },
+        {
+          "command": "snippetCanvas.moveSnippetUp",
+          "when": "view == snippetCanvas.snippets && viewItem == snippetCanvas.snippet",
+          "group": "navigation@1"
+        },
+        {
+          "command": "snippetCanvas.moveSnippetDown",
+          "when": "view == snippetCanvas.snippets && viewItem == snippetCanvas.snippet",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  },
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "build:packages": "npm run build --workspaces --if-present",
-    "build:playground": "npm run build --workspace apps/playground",
-    "test": "vitest run tests",
-    "test:watch": "npm run test:watch --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present && tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "npm run lint -- --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "checks": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
-    "pack:check": "npm pack --workspaces --dry-run",
-    "test:unit": "vitest run --config vitest.config.ts",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "storybook": "storybook dev",
-    "build:storybook": "storybook build"
+    "clean": "rimraf dist webview-dist",
+    "build": "npm run build:extension && npm run build:webview",
+    "build:host": "npm run build:extension",
+    "build:webview": "vite build --config vite.webview.config.ts",
+    "dev": "concurrently -k -n extension,webview,preview,vscode \"npm run watch:extension\" \"npm run watch:webview\" \"npm run dev:preview\" \"npm run dev:extension\"",
+    "watch": "concurrently -k -n extension,webview \"npm run watch:extension\" \"npm run watch:webview\"",
+    "package": "vsce package",
+    "publish:extension": "node scripts/publish.mjs",
+    "typecheck": "tsc --noEmit && tsc --noEmit --project tsconfig.webview.json",
+    "demo:e2e": "node demo/run-playwright.mjs",
+    "demo:e2e:install": "playwright install chromium-headless-shell",
+    "demo:e2e:ui": "node demo/run-playwright.mjs --ui",
+    "demo:e2e:report": "playwright show-report demo/artifacts/report",
+    "demo:record": "node demo/record-demo.mjs",
+    "vscode:prepublish": "npm run build",
+    "build:extension": "vite build --config vite.extension.config.ts",
+    "watch:extension": "vite build --watch --mode development --config vite.extension.config.ts",
+    "watch:webview": "vite build --watch --mode development --config vite.webview.config.ts",
+    "dev:preview": "vite --config vite.webview.config.ts --host 127.0.0.1",
+    "dev:extension": "node ./scripts/run-extension-dev.mjs"
+  },
+  "dependencies": {
+    "@fontsource/fira-code": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/roboto-mono": "^5.3.0",
+    "@fontsource/source-code-pro": "^5.3.0",
+    "@fontsource/space-mono": "^5.3.0",
+    "dom-to-image-more": "^3.10.2",
+    "highlight.js": "^11.12.0",
+    "lucide-react": "^0.468.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-gcolor-picker": "^1.3.5"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^24.3.1",
-    "eslint": "^10.0.0",
-    "prettier": "^3.6.2",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.70.0",
-    "vite": "^7.3.7",
-    "vitest": "^3.2.7",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^16.3.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@playwright/test": "^1.56.0",
-    "@storybook/react-vite": "^9.1.0",
-    "storybook": "^9.1.0"
-  },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ]
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/vscode": "^1.90.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vscode/vsce": "^3.1.1",
+    "concurrently": "^8.2.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.3"
+  }
 }

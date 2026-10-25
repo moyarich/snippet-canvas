@@ -1,72 +1,141 @@
-# Reusable Workflows Callers — Monorepo Template
+# SnippetCanvas
 
-Starter template for npm-workspaces projects modeled on recent `moyarich` repositories.
+Create polished, publication-ready code compositions without leaving VS Code.
 
-## Structure
+SnippetCanvas lets you collect selected code or complete files, arrange independent snippets across resizable columns and multiple fixed-size pages, style the result, and export it as PNG, JPEG, SVG, or PDF.
 
-| Path                 | Purpose                                                             |
-| -------------------- | ------------------------------------------------------------------- |
-| `packages/example/`  | Buildable TypeScript library with Vitest tests                      |
-| `apps/playground/`   | Vite + React playground consuming example library                   |
-| `.github/workflows/` | CI, release, publishing, maintenance, and reusable workflow callers |
-| `eslint.config.mjs`  | Shared ESLint flat config and Prettier compatibility                |
-| `tsconfig.json`      | Shared TypeScript defaults                                          |
+![SnippetCanvas visual walkthrough: switch layouts, apply a preset, customize one column, choose export settings, and preview the finished composition](media/snippetcanvas-demo.gif)
+
+The walkthrough above shows the core workflow: choose a layout, apply a style preset, customize an individual code column, configure the export, and review the finished canvas.
+
+## Highlights
+
+- Capture the current selection or an entire file.
+- Combine snippets from multiple files without merging their code or line numbers.
+- Arrange code using Fit, Grid, or Flow layouts.
+- Resize individual columns from the left, right, bottom, or corner.
+- Continue long snippets across columns and pages without hiding code.
+- Use US Letter, A4, or custom page dimensions.
+- Apply presets, syntax themes, coding fonts, shadows, frames, gradients, captions, watermarks, icons, and tilt.
+- Override global styling for one selected column.
+- Export one column, the current page, or every page.
+- Export PNG, JPEG, SVG, or multi-page PDF at up to 4× resolution.
+- Prevent export when code is clipped or unreadable.
 
 ## Getting started
 
-```sh
-npm install
-npm run dev
-npm run checks
-npm run pack:check
-```
+1. Open a code file in VS Code.
+2. Select the code you want to capture, or leave the selection empty to work with the complete file.
+3. Right-click in the editor and open the **SnippetCanvas** submenu.
+4. Choose **Add Selection** or **Add Entire File**.
+5. Run **SnippetCanvas: Open Composer** from the Command Palette.
+6. Arrange and style the page, then choose an export format.
 
-Root build and test scripts delegate to npm workspaces using `--workspaces --if-present`. Development targets the conventional `apps/playground` path, without hardcoding a package name. Vite handles individual workspace builds and the playground development server; no custom workspace runner is needed. Rename the `@template/*` workspaces and replace the example package with your own code.
+Captured snippets also appear in the SnippetCanvas Activity Bar view, where you can inspect, rename, reorder, and delete them.
 
-## Workflows and release safety
+### A quick first composition
 
-The GitHub Actions callers were copied from `moyarich/workspace-tools`. Review all hardcoded package selectors, release triggers, publishing secrets, branch names, and build paths before enabling them in a new repository. In particular, automatic release/publish workflows should remain dry-run or disabled until intentionally configured.
+1. Add two or three selections from the editor so each becomes its own code column.
+2. Open the composer and try **Fit** to keep snippets intact, **Grid** for a structured arrangement, or **Flow** for content-aware widths.
+3. Apply a style preset, then select any column to give it a custom title, highlighted lines, or independent styling.
+4. Set the output format and resolution in the **Page** panel.
+5. Resolve any clipping warning, then export the current page or the complete document.
 
-The Workspace Tools CLI source in migrated callers is `checkout:upstream;branch:main`, not `checkout:current`, because this repository does not contain the Workspace Tools package. For reproducible releases, pin a published CLI version or immutable commit.
+## Pages and columns
 
-`check-dist.yml` is an opt-in example for projects that commit build outputs. If package `dist/` is gitignored, this check will fail until you explicitly choose to track distributions or replace it with an artifact-only check.
+A **Page** is the fixed-size artwork that SnippetCanvas exports. It behaves like an Illustrator artboard.
 
-`npm run pack:check` uses npm's built-in `--workspaces` flag and includes all configured workspaces, so adjust the workspace selection if you only want to pack publishable packages.
+A **Column** is a code panel contained by a page. Columns can have independent dimensions and appearance overrides, but they remain constrained by the available page area.
 
-## Typical scripts
+Long code can continue into additional columns or pages while retaining its original line numbers. Separate source snippets always remain separate.
 
-`npm run dev`, `npm run build`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run checks`.
+## Layout modes
 
-## Adapting this template
+### Fit
 
-Add packages under `packages/*`, applications under `apps/*`, and their own `build`, `typecheck`, and `test` scripts. Keep reusable logic in packages and application-specific examples in playgrounds. Configure registry publishing only for real release packages.
+Keeps each source snippet intact and automatically sizes the live and exported page to display every line and the longest code line. The page is identified as Custom while width, height, and preset controls remain available as composition constraints.
 
-## Tests and component stories
+### Grid
 
-The template includes a root `vitest.config.ts`, `playwright.config.ts`, and `.storybook/` configuration. Vitest discovers `*.test.*` files in root, package and application test folders; Playwright discovers `*.spec.*` files and starts the Vite playground on port 4173. Storybook scans stories in application, package and source directories.
+Uses **Maximum columns per row** as an upper limit. Columns wrap when the next panel cannot fit. Changing the maximum provides an initial equal-width layout, after which each column remains independently resizable.
 
-```sh
-npm run test:unit
-npx playwright install chromium
-npx playwright test
-npm run storybook
-npm run build:storybook
-```
+### Flow
 
-The CI caller runs Playwright directly on `main`, manual dispatch and PRs changing spec/config files. Projects can change their Playwright fixtures and `webServer` settings in `playwright.config.ts`; no CI-specific package script is required. Storybook is a development-only workspace tool and is not included in the published example package.
+Uses content-aware column widths and places as many columns as fit in each row. Remaining row space is distributed across the columns in that row.
 
-## Workflow consumer inventory
+## Styling
 
-Run the private/manual **Inventory reusable workflow consumers** GitHub Actions workflow (`workflow_dispatch`) to scan the default-branch workflow files of repositories accessible to `_WORKFLOW_TOKEN`. The workflow commits [the generated Markdown table](docs/workflow-consumers.md) and prints it in the Actions job summary. The token must have read access to all target repositories and write access to this repository. Private repositories are excluded by default. The manual `include-private` input opts in to publishing their names in this repository's committed inventory, which may be publicly readable.
+Start with Midnight, Dracula, Nord, or Paper presets, then customize:
 
-## Release version selection
+- Syntax theme and language
+- Bundled coding font or Google Font family
+- Font size, line height, indentation, and alignment
+- Internal padding and corner radius
+- macOS, minimal, terminal, or frameless window styles
+- Shadow position, blur, spread, opacity, and color
+- Solid or gradient paint with alpha transparency, plus image page backgrounds
+- Editable titles and title typography
+- Emphasized lines using values such as `3, 5-8`
+- Captions, watermarks, icons, emoji, and tilt
 
-The `prepare-release-pr.yml` dispatch supports `package-json` (the default) to use each selected package's current declared `package.json` version without incrementing it, alongside `patch`, `minor`, and `major`.
+Global column settings affect every inherited column. Select a column to override those values only for that panel, or reset it to the global defaults.
 
-## Copy shared CI callers to other repositories
+## Exporting
 
-[`.github/copy.yml`](.github/copy.yml) explicitly lists canonical workflow files and destination repositories. Each destination can specify `include`, `exclude`, and `overrides` keyed by source file path. The generator always reads the **source** workflow, applies destination overrides using `ruamel.yaml`, and copies the generated workflow into the target repository; it does not merge with the target's existing YAML.
+SnippetCanvas supports:
 
-The [copy workflow](.github/workflows/copy.yml) generates destination-specific YAML and uses the first-party `reusable-workflows/actions/copy-files-to-another-repository` composite action to transfer it. It runs automatically when canonical files or synchronization logic change on `main`. Manual dispatch defaults to a dry run that clones the destination and prints the diff summary without pushing. The existing `_WORKFLOW_TOKEN` secret must be able to read and write destination repositories and modify workflow files.
+- PNG
+- JPEG with quality control
+- SVG
+- Multi-page PDF
+- Copy current page as an image
+- Export selected column as PNG from its context menu
 
-Currently, synchronization pushes directly to the destination branch, not a PR. An unchanged generated file results in no new commit. Files removed from the source selection are **not** deleted at the destination. Override keys must already exist in the source workflow; only `jobs`, `env`, `defaults`, `name`, and `run-name` may be overridden. This synchronization does not dynamically dispatch GitHub Actions workflows.
+Before exporting, SnippetCanvas checks the selected scope for clipped code. If a line or snippet does not fit, the composer identifies the affected page and column so it can be corrected. Workspace selection outlines, resize handles, context menus, and editor-only controls are excluded from exported artwork.
+
+## Workspace controls
+
+- Zoom from 10% to 200%.
+- Fit the current page to the workspace.
+- Return to 100% zoom.
+- Pan with Space-drag or the middle mouse button.
+- Zoom around the cursor with Ctrl/Cmd-wheel.
+- Use `+`, `-`, `0`, and `1` keyboard shortcuts.
+- Collapse the settings sidebar for a distraction-free workspace.
+
+## Commands
+
+- **SnippetCanvas: Add Selection**
+- **SnippetCanvas: Add Entire File**
+- **SnippetCanvas: Open Composer**
+- **SnippetCanvas: Clear Snippets**
+
+Editor commands are grouped under the **SnippetCanvas** context submenu.
+
+## Settings
+
+Open VS Code Settings and search for `SnippetCanvas` to configure defaults for:
+
+- Layout mode, maximum columns, and gaps
+- Page size, padding, and background
+- Column dimensions and typography
+- Optional proportional font scaling while resizing columns
+- Syntax themes and colors
+- Window frames, shadows, and titles
+- Decorations and appearance
+
+Use `snippetCanvas.mode` to select the default layout for new composer documents. The default is `fit`.
+
+Enable `snippetCanvas.column.scaleFontOnResize` to shrink or grow a column's code font proportionally when resizing the column with its edge or corner handles. It is disabled by default.
+
+Composer changes are saved per workspace so your pages and snippet arrangement are restored when the composer is reopened.
+
+## Requirements
+
+- VS Code 1.90 or newer
+
+## Privacy
+
+SnippetCanvas composes and exports code locally. A network connection is needed only when you explicitly enter a Google Fonts family that is not bundled with the extension.
+
+### Google Fonts family bundled with the extension

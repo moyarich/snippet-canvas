@@ -1,0 +1,84 @@
+:root {
+  color-scheme: dark;
+  --sc-foreground: var(--vscode-foreground, #e4e4e7);
+  --sc-editor-background: var(--vscode-editor-background, #18181b);
+  --sc-sidebar-background: var(--vscode-sideBar-background, #202024);
+  --sc-widget-background: var(--vscode-editorWidget-background, #222228);
+  --sc-sidebar-background-border: var(--vscode-panel-border, #3f3f46);
+  --sc-widget-border: var(--vscode-widget-border, rgba(255, 255, 255, 0.1));
+  --sc-description: var(
+    --vscode-descriptionForeground,
+    rgba(255, 255, 255, 0.62)
+  );
+  --sc-muted: var(
+    --vscode-disabledForeground,
+    rgba(255, 255, 255, 0.4)
+  );
+  --sc-focus: var(--vscode-focusBorder, #8b5cf6);
+  --sc-input-background: var(--vscode-input-background, #27272a);
+  --sc-input-foreground: var(--vscode-input-foreground, #f4f4f5);
+  --sc-input-border: var(--vscode-input-border, #52525b);
+  --sc-dropdown-background: var(--vscode-dropdown-background, #27272a);
+  --sc-dropdown-border: var(--vscode-dropdown-border, #52525b);
+  --sc-button-background: var(--vscode-button-background, #7c3aed);
+  --sc-button-foreground: var(--vscode-button-foreground, #ffffff);
+  --sc-button-border: var(--vscode-button-border, transparent);
+  --sc-button-secondary-background: var(
+    --vscode-button-secondaryBackground,
+    #3f3f46
+  );
+  --sc-button-secondary-hover: var(
+    --vscode-button-secondaryHoverBackground,
+    #52525b
+  );
+  --sc-toolbar-hover: var(
+    --vscode-toolbar-hoverBackground,
+    rgba(255, 255, 255, 0.08)
+  );
+  --sc-selection-background: var(
+    --vscode-list-activeSelectionBackground,
+    #6d28d9
+  );
+  --sc-selection-foreground: var(
+    --vscode-list-activeSelectionForeground,
+    #ffffff
+  );
+  --sc-menu-background: var(--vscode-menu-background, #27272a);
+  --sc-menu-foreground: var(--vscode-menu-foreground, #f4f4f5);
+  --sc-menu-border: var(--vscode-menu-border, #52525b);
+  --sc-menu-separator: var(--vscode-menu-separatorBackground, #52525b);
+  --sc-menu-selection-background: var(
+    --vscode-menu-selectionBackground,
+    #6d28d9
+  );
+  --sc-menu-selection-foreground: var(
+    --vscode-menu-selectionForeground,
+    #ffffff
+  );
+  --sc-error: var(--vscode-errorForeground, #f48771);
+  --sc-badge-background: var(
+    --vscode-badge-background,
+    rgba(255, 255, 255, 0.1)
+  );
+  --sc-badge-foreground: var(--vscode-badge-foreground, #e4e4e7);
+  --sc-scrollbar: var(
+    --vscode-scrollbarSlider-background,
+    rgba(255, 255, 255, 0.18)
+  );
+  --sc-link: var(--vscode-textLink-foreground, #3794ff);
+  --sc-ui-font: var(--vscode-font-family, Inter, sans-serif);
+  --sc-editor-font: var(
+    --vscode-editor-font-family,
+    "JetBrains Mono",
+    monospace
+  );
+  --sc-font-xs: 10px;
+  --sc-font-sm: 11px;
+  --sc-font-md: 12px;
+  --sc-font-lg: 14px;
+  --sc-line-height: 1.4;
+  --sc-radius: 8px;
+  --sc-radius-sm: 6px;
+  --sc-ring: color-mix(in srgb, var(--sc-focus) 42%, transparent);
+  --sc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
