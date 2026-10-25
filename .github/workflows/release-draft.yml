@@ -1,8 +1,8 @@
 name: Release Draft
 
 run-name: >-
-  Release draft · ${{ github.event_name == 'workflow_dispatch' && inputs.package ||
-  'changed' }}
+  Release draft · ${{ github.event_name == 'workflow_dispatch' && inputs.package
+  || 'changed' }}
 
 on:
   workflow_dispatch:
@@ -25,6 +25,7 @@ on:
         options:
           - all
           - packages/example
+          - packages/snippet-canvas
       version-mode:
         description: Version mode
         required: true
@@ -92,15 +93,18 @@ jobs:
     with:
       packages-json: ${{ needs.discover-packages.outputs.packages }}
       ignored-paths-json: '[".github/workflows/release-draft.yml"]'
-      package: ${{ github.event_name == 'workflow_dispatch' && inputs.package ||
-        'all' }}
+      package: ${{ github.event_name == 'workflow_dispatch' && inputs.package || 'all'
+        }}
       event-name: ${{ github.event_name }}
       before-sha: ${{ github.event.before || '' }}
       after-sha: ${{ github.sha }}
       target-branch: ${{ github.ref_name }}
-      version-mode: ${{ github.event_name == 'workflow_dispatch' && inputs.version-mode || '' }}
-      version-bump: ${{ github.event_name == 'workflow_dispatch' && inputs.version-bump || '' }}
-      exact-version: ${{ github.event_name == 'workflow_dispatch' && inputs.exact-version || '' }}
+      version-mode: ${{ github.event_name == 'workflow_dispatch' &&
+        inputs.version-mode || '' }}
+      version-bump: ${{ github.event_name == 'workflow_dispatch' &&
+        inputs.version-bump || '' }}
+      exact-version: ${{ github.event_name == 'workflow_dispatch' &&
+        inputs.exact-version || '' }}
 
   draft-package:
     name: "package: ${{ matrix.name }} | dir: ${{ matrix.directory }}"
@@ -114,8 +118,7 @@ jobs:
           needs.select-packages.outputs.has-packages == 'true' }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.select-packages.outputs.matrix ||
-        '{"include":[]}') }}
+      matrix: ${{ fromJSON(needs.select-packages.outputs.matrix || '{"include":[]}') }}
     concurrency:
       group: draft-package-${{ github.repository }}-${{ matrix.directory }}
       cancel-in-progress: true
@@ -136,4 +139,5 @@ jobs:
       changelog-path: ${{ format('{0}/CHANGELOG.md', matrix.directory) }}
       package-name: ${{ matrix.name }}
       package-directory: ${{ matrix.directory }}
-      dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run || false }}
+      dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run || false
+        }}

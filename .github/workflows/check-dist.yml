@@ -12,20 +12,22 @@ on:
         required: true
         default: "all"
         options:
-          - "all"
-          - "packages/example"
+          - all
+          - packages/example
+          - packages/snippet-canvas
       config-path:
         description: Repository-local YAML distribution configuration path
         type: string
         default: .github/check-dist-config.yml
       dist-path:
         description: "Distribution path template. Supports {packageDir}, {package},
-          {packageName}, {workspace}; blank uses repository configuration or {packageDir}/dist."
+          {packageName}, {workspace}; blank uses repository configuration or
+          {packageDir}/dist."
         type: string
         default: ""
       build-command:
-        description: Build command override (for example npm run build:cli); 
-          empty uses the selected workspace build
+        description: Build command override (for example npm run build:cli); empty uses
+          the selected workspace build
         type: string
         default: ""
       install-command:
@@ -37,8 +39,7 @@ on:
         type: boolean
         default: true
       commit:
-        description: Commit updated output only when dry-run is false (single 
-          package only)
+        description: Commit updated output only when dry-run is false (single package only)
         type: boolean
         default: false
       node-caching:
@@ -62,13 +63,11 @@ on:
 
 permissions: {}
 
-
 jobs:
   check-dist:
     permissions:
       contents: write
-    uses: 
-      moyarich/reusable-workflows/.github/workflows/reusable_self-heal-check-dist.yml@main
+    uses: moyarich/reusable-workflows/.github/workflows/reusable_self-heal-check-dist.yml@main
     with:
       package: ${{ inputs.package }}
       config-path: ${{ inputs.config-path }}
