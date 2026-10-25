@@ -1,0 +1,9 @@
+node_modules/
+dist/
+webview-dist/
+demo/artifacts/
+*.vsix
+.env
+!.env.example
+!.vscode/launch.json
+!.vscode/tasks.json

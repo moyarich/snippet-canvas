@@ -1,5 +1,5 @@
 import { createServer } from "node:net";
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 async function findAvailablePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -26,21 +26,16 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("PLAYWRIGHT_PORT must be a valid TCP port");
 }
 process.env.PLAYWRIGHT_PORT = String(port);
-const baseURL = `http://127.0.0.1:${port}`;
+
+process.env.SNIPPETCANVAS_TEST_PORT = String(port);
+const { default: loadedConfig } = await import("./packages/snippet-canvas/demo/playwright.config");
+
+const snippetCanvas = "default" in loadedConfig ? loadedConfig.default : loadedConfig;
 
 export default defineConfig({
-  testDir: ".",
-  testMatch: "**/*.spec.{ts,tsx,js,jsx}",
-  testIgnore: ["**/node_modules/**", "**/dist/**"],
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? "github" : "list",
-  use: { baseURL, trace: "on-first-retry" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  ...snippetCanvas,
   webServer: {
-    command: `npm exec --workspace apps/playground -- vite --host 127.0.0.1 --port ${port} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: false,
-    timeout: 120_000,
+    ...snippetCanvas.webServer,
+    command: `npm run dev:preview --workspace snippetcanvas -- --port ${port} --strictPort`,
   },
 });

@@ -6,6 +6,7 @@ Starter template for npm-workspaces projects modeled on recent `moyarich` reposi
 
 | Path                 | Purpose                                                             |
 | -------------------- | ------------------------------------------------------------------- |
+| `packages/snippet-canvas/` | SnippetCanvas VS Code extension with a React webview |
 | `packages/example/`  | Buildable TypeScript library with Vitest tests                      |
 | `apps/playground/`   | Vite + React playground consuming example library                   |
 | `.github/workflows/` | CI, release, publishing, maintenance, and reusable workflow callers |
@@ -70,3 +71,17 @@ The `prepare-release-pr.yml` dispatch supports `package-json` (the default) to u
 The [copy workflow](.github/workflows/copy.yml) generates destination-specific YAML and uses the first-party `reusable-workflows/actions/copy-files-to-another-repository` composite action to transfer it. It runs automatically when canonical files or synchronization logic change on `main`. Manual dispatch defaults to a dry run that clones the destination and prints the diff summary without pushing. The existing `_WORKFLOW_TOKEN` secret must be able to read and write destination repositories and modify workflow files.
 
 Currently, synchronization pushes directly to the destination branch, not a PR. An unchanged generated file results in no new commit. Files removed from the source selection are **not** deleted at the destination. Override keys must already exist in the source workflow; only `jobs`, `env`, `defaults`, `name`, and `run-name` may be overridden. This synchronization does not dynamically dispatch GitHub Actions workflows.
+
+## SnippetCanvas
+
+The VS Code extension lives in `packages/snippet-canvas`. See its [README](packages/snippet-canvas/README.md) and [development guide](packages/snippet-canvas/README.dev.md).
+
+```sh
+npm run build --workspace snippetcanvas
+npm run typecheck --workspace snippetcanvas
+npm run dev:preview --workspace snippetcanvas
+npm run demo:e2e --workspace snippetcanvas
+npm run package --workspace snippetcanvas
+```
+
+The playground uses editable MoyaForge documentation components, renders repository-owned MDX guides from `docs/`, and includes a live composer at `#/playground`. Run `npm run dev --workspace @moyarich/snippet-canvas-playground` to view it.

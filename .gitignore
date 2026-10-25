@@ -38,3 +38,8 @@ Thumbs.db
 !.vscode/extensions.json
 
 .local
+
+# Extension output and browser test artifacts
+webview-dist/
+*.vsix
+**/demo/artifacts/

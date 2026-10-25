@@ -1,0 +1,24 @@
+# Getting started
+
+## Open SnippetCanvas
+
+Install the packaged extension in VS Code. Select code in an editor, right-click, and choose **SnippetCanvas → Add Selection**, or use **Add Entire File**. Open **SnippetCanvas: Open Composer** from the Command Palette.
+
+## Arrange snippets
+
+Choose Fit, Grid, or Flow. Adjust page padding and backgrounds in Page controls, set shared defaults in Columns, and select a column to customize its appearance.
+
+## Save your composition
+
+Use the export controls to choose PNG, JPEG, SVG, or PDF and a resolution. The extension saves the output to your chosen location.
+
+## Build an extension package
+
+From the repository root:
+
+```sh
+npm ci
+npm run package --workspace snippetcanvas
+```
+
+The VSIX is created in `packages/snippet-canvas`. Use **Extensions: Install from VSIX** in VS Code to install it.

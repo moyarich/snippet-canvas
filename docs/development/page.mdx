@@ -1,0 +1,29 @@
+# Development
+
+## Workspace layout
+
+`packages/snippet-canvas` contains the VS Code extension and React composer. `apps/playground` hosts this MoyaForge documentation site and the live composer preview. Authored guides live in the repository’s `docs` directory.
+
+## Run the documentation site
+
+```sh
+npm ci
+npm run dev --workspace @moyarich/snippet-canvas-playground
+```
+
+## Build and check
+
+```sh
+npm run typecheck
+npm run build
+npm test
+npm run demo:e2e --workspace snippetcanvas
+```
+
+## Extension development
+
+Open `packages/snippet-canvas` as a VS Code folder and run its included launch configuration. Separate Vite builds emit the host at `dist/extension.js` and the webview under `dist/webview`.
+
+## MoyaForge components
+
+The documentation shell, outline, and copyable code blocks are editable MoyaForge registry components. The pinned registry URL is recorded in `apps/playground/moyaforge.components.json`. Each component imports its own styles. The host owns routing and repository documentation.
