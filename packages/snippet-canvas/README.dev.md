@@ -210,3 +210,7 @@ Following `react-webview-vite-template-1`, the extension and React webview have 
 `src/protocol.ts` defines the shared message and document types. `src/webview/api/vscode-api.ts` acquires the VS Code API once and supplies the browser preview shim. The React provider handles subscriptions independently of that API.
 
 Run `npm run dev` for both build watchers, the browser preview server, and an Extension Development Host. Set `CODE_COMMAND` if the VS Code CLI has a different name. Run `npm run dev:preview` for browser-only development and open `/webview-preview.html`. `npm run watch` watches both production asset builds. `npm run package` invokes the prepublish build before packaging.
+
+## Monorepo workspace
+
+Run the commands above from `packages/snippet-canvas`, or use `npm run <script> --workspace snippetcanvas` from the repository root. Install dependencies from the root with `npm install`; the root lockfile covers all workspaces. To debug the extension with its included launch configuration, open `packages/snippet-canvas` as the VS Code folder. Root Playwright configuration runs this package’s browser suite.

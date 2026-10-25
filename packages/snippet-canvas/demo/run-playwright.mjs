@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
 import { createServer } from "node:net";
 
 /** Ask the operating system for an unused local port. */
@@ -20,8 +21,8 @@ const args = process.argv.slice(2);
 const demoIndex = args.indexOf("--demo");
 const isDemo = demoIndex >= 0;
 if (isDemo) args.splice(demoIndex, 1);
-const cli = new URL("../node_modules/@playwright/test/cli.js", import.meta.url);
-const child = spawn(process.execPath, [cli.pathname, "test", "-c", "demo/playwright.config.ts", ...args], {
+const cli = createRequire(import.meta.url).resolve("@playwright/test/cli");
+const child = spawn(process.execPath, [cli, "test", "-c", "demo/playwright.config.ts", ...args], {
   cwd: new URL("..", import.meta.url),
   env: {
     ...process.env,

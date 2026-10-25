@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import process from "node:process";
 
 const args = process.argv.slice(2);
@@ -54,15 +53,7 @@ if (!dryRun && !process.env.VSCE_PAT && !hasExplicitAuthentication) {
 }
 
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-const vsceCommand = process.platform === "win32" ? "vsce.cmd" : "vsce";
-const localVsce = fileURLToPath(
-  new URL(`../node_modules/.bin/${vsceCommand}`, import.meta.url),
-);
-
-if (!existsSync(localVsce)) {
-  console.error("The local vsce executable is missing. Run npm install first.");
-  process.exit(1);
-}
+const vsceCli = createRequire(import.meta.url).resolve("@vscode/vsce/vsce");
 
 function run(command, commandArgs) {
   const result = spawnSync(command, commandArgs, {
@@ -87,8 +78,8 @@ run(npmCommand, ["run", "build"]);
 
 if (dryRun) {
   console.log("Creating a local VSIX (dry run; nothing will be published)...");
-  run(localVsce, ["package", ...args]);
+  run(process.execPath, [vsceCli, "package", ...args]);
 } else {
   console.log("Publishing SnippetCanvas to the Visual Studio Marketplace...");
-  run(localVsce, ["publish", ...args]);
+  run(process.execPath, [vsceCli, "publish", ...args]);
 }
