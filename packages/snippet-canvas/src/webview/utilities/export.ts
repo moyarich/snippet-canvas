@@ -103,7 +103,7 @@ const exportFilter = (child: Node) => !(child instanceof HTMLElement && child.da
 
 export async function renderPages(pages: HTMLElement[], format: ExportFormat, scale: number, quality: number) {
   const dimensions = pages.map((page) => ({ width: page.offsetWidth, height: page.offsetHeight }));
-  let dataUrls = await Promise.all(pages.map((page, index) => {
+  const dataUrls = await Promise.all(pages.map((page, index) => {
     const options = { ...dimensions[index], scale, cacheBust: true, filter: exportFilter };
     if (format === "svg") return domToImage.toSvg(page, { ...options, scale: 1 });
     if (format === "jpeg") return domToImage.toJpeg(page, { ...options, quality });
