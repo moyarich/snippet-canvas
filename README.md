@@ -83,3 +83,5 @@ npm run dev:preview --workspace snippetcanvas
 npm run demo:e2e --workspace snippetcanvas
 npm run package --workspace snippetcanvas
 ```
+
+The playground uses editable MoyaForge documentation components, renders repository-owned MDX guides from `docs/`, and includes a live composer at `#/playground`. Run `npm run dev --workspace @moyarich/snippet-canvas-playground` to view it.

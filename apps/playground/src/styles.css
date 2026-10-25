@@ -1,0 +1,10 @@
+body { margin: 0; font-family: Inter, system-ui, sans-serif; }
+* { box-sizing: border-box; }
+button, input { font: inherit; }
+.playground-nav { display: grid; gap: 6px; padding: 20px; }
+.playground-nav a { color: inherit; text-decoration: none; padding: 10px 12px; border-radius: 8px; }
+.playground-nav a[aria-current="page"] { background: #8b5cf620; color: #7c3aed; font-weight: 600; }
+.playground-version { padding: 20px 32px; font-size: 13px; opacity: .7; }
+.composer-preview { width: 100%; height: 760px; border: 1px solid #64748b55; border-radius: 12px; background: #111827; }
+.preview-link { display: inline-block; margin-bottom: 16px; }
+img { max-width: 100%; }
