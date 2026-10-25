@@ -7,7 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import type { ClientMessage, HostMessage, SnippetCanvasDocument } from "../../types";
+import type { ClientMessage, HostMessage } from "../../types";
 import { getVsCodeApi } from "../../api/vscode-api";
 type Bridge = {
   post: (m: ClientMessage) => void;
