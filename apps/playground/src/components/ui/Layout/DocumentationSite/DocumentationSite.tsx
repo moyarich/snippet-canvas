@@ -32,7 +32,6 @@ export function DocumentationSite({
   title,
   children,
   repository,
-  repositoryBranch = "main",
   pages = [],
   currentPath,
   sidebar,
