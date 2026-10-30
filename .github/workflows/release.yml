@@ -1,11 +1,10 @@
 name: Release package
 
 run-name: >-
-  Release · ${{ inputs.package }} · ${{ inputs.version-mode }}${{
-  inputs.version-mode == 'bump' && format(':{0}', inputs.version-bump) ||
-  inputs.version-mode == 'exact' && format(':{0}', inputs.exact-version) || ''
-  }} · ${{ inputs.draft && 'draft' || 'published' }} · dry-run=${{
-  inputs.dry-run }}
+  Release · ${{ inputs.package }} · ${{ inputs.version-mode }}${{ inputs.version-mode
+  == 'bump' && format(':{0}', inputs.version-bump) || inputs.version-mode == 'exact'
+  && format(':{0}', inputs.exact-version) || '' }} · ${{ inputs.draft && 'draft' ||
+  'published' }} · dry-run=${{ inputs.dry-run }}
 
 on:
   workflow_dispatch:
@@ -27,14 +26,13 @@ on:
         default: all
         options:
           - all
-          - packages/example
-          - packages/snippet-canvas
+          - "packages/example"
       version-mode:
         description: Resolve each package version
         type: choice
         required: true
         default: auto
-        options: [ auto, bump, package-json, exact ]
+        options: [auto, bump, package-json, exact]
       initial-version:
         description: Initial release version for auto mode
         type: string
@@ -45,15 +43,14 @@ on:
         type: choice
         required: true
         default: patch
-        options: [ patch, minor, major, prepatch, preminor, premajor, prerelease ]
+        options: [patch, minor, major, prepatch, preminor, premajor, prerelease]
       exact-version:
         description: Version for exact mode (all selected packages)
         type: string
         required: false
         default: ""
       commit-version-changes:
-        description: Commit prepared versions and lockfile to the selected branch before
-          release
+        description: Commit prepared versions and lockfile to the selected branch before release
         type: boolean
         required: true
         default: false
